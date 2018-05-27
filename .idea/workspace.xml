@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="013d4ae9-4b9b-4ba8-bf28-ad13dbe9c801" name="Default" comment="" />
+    <list default="true" id="013d4ae9-4b9b-4ba8-bf28-ad13dbe9c801" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RemoveDuplicates.py" beforeDir="false" afterPath="$PROJECT_DIR$/RemoveDuplicates.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/duplicate.txt" beforeDir="false" afterPath="$PROJECT_DIR$/duplicate.txt" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -10,12 +15,12 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file leaf-file-name="RemoveDuplicates.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/RemoveDuplicates.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="756">
-              <caret line="145" column="48" selection-start-line="145" selection-start-column="48" selection-end-line="145" selection-end-column="48" />
+            <state relative-caret-position="866">
+              <caret line="130" lean-forward="true" selection-start-line="130" selection-end-line="130" />
             </state>
           </provider>
         </entry>
@@ -29,6 +34,9 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
@@ -38,11 +46,12 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="3155" />
-    <option name="y" value="40" />
+    <option name="x" value="2601" />
+    <option name="y" value="43" />
     <option name="width" value="1660" />
-    <option name="height" value="1355" />
+    <option name="height" value="982" />
   </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
@@ -63,7 +72,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../G Drive/GitHub/SocialMediaAnalytics" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../RenamePics" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
@@ -83,7 +92,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.RemovDuplicates all">
+  <component name="RunManager" selected="Python.RemoveDuplicates">
     <configuration name="RemovDuplicates all" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="RemoveDuplicates" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -162,14 +171,15 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="3036" y="32" width="1328" height="1084" extended-state="0" />
+    <frame x="2601" y="43" width="1660" height="982" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.22983257" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.22931874" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.502211" side_tool="true" weight="0.48546824" />
-      <window_info anchor="bottom" id="Version Control" order="8" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Python Console" order="9" sideWeight="0.497789" weight="0.32938644" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.7652311" weight="0.47799385" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.7652311" visible="true" weight="0.47766322" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="10" />
       <window_info id="Favorites" order="2" side_tool="true" />
@@ -180,8 +190,8 @@
       <window_info anchor="right" id="Data View" order="3" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Message" order="0" />
     </layout>
   </component>
   <component name="VcsContentAnnotationSettings">
@@ -189,13 +199,6 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/RemoveDuplicates.py</url>
-          <line>133</line>
-          <option name="timeStamp" value="18" />
-        </line-breakpoint>
-      </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
           <properties notifyOnTerminate="true" exception="BaseException">
@@ -203,24 +206,29 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="19" />
+      <option name="time" value="21" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/RemovDuplicates.py">
+    <entry file="file://$PROJECT_DIR$/RemoveDuplicates.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="37">
-          <caret line="39" lean-forward="true" selection-start-line="39" selection-end-line="39" />
-          <folding>
-            <element signature="e#102#112#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="2516">
+          <caret line="148" lean-forward="true" selection-start-line="148" selection-end-line="148" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/RemoveDuplicates.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="756">
+        <state relative-caret-position="2465">
           <caret line="145" column="48" selection-start-line="145" selection-start-column="48" selection-end-line="145" selection-end-column="48" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RemovDuplicates.py" />
+    <entry file="file://$PROJECT_DIR$/RemoveDuplicates.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="866">
+          <caret line="130" lean-forward="true" selection-start-line="130" selection-end-line="130" />
         </state>
       </provider>
     </entry>

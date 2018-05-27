@@ -99,7 +99,7 @@ ENV/
 .mypy_cache/
 
 # Project specific
-*.csv
+*.xlsx
 .idea
 test.py
 workspace.xml

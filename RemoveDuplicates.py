@@ -119,23 +119,19 @@ if __name__ == '__main__':
             dupTuples.append(dt)
         CurrentInstance.tupleID = dupTuples.index(dt)
         allDups.append(CurrentInstance)
-        print "End of File"
+        print "Finished processing the duplicates file\n"
 
+    """
 
+    Print results
 
-    print "number of tuples %s" % len(dupTuples)
-    # print dupTuples
-    for i in range(0, len(dupTuples)):
-        for j in range(0, len(dupTuples[i])):
-            print i, j, dupTuples[i][j]
-        print
+    """
 
-    #DupsInTuple = range(len(dupTuples))
-    DupsInTuple = [0] * (len(dupTuples))
     print "number of duplicates %s " % len(allDups)
-    #
+
+    # DupsInTuple Count how many dups in each tuple
+    DupsInTuple = [0] * (len(dupTuples))
     for i in range(0, len(allDups)):
-        # print allDups[i].Count, allDups[i].tupleID
         DupsInTuple[allDups[i].tupleID] += 1
 
     print "number of tuples %s" % len(dupTuples)
@@ -143,7 +139,16 @@ if __name__ == '__main__':
     for i in range(0, len(dupTuples)):
         for j in range(0, len(dupTuples[i])):
             print i, j, dupTuples[i][j]
-        print "Number of dups in this tuple %s\n" % DupsInTuple[i]
+        print "Number of dups in this tuple %s" % DupsInTuple[i]
+        print
+
+
+
+
+
+
+
+
 
 
 
