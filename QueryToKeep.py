@@ -1,52 +1,66 @@
 from Tkinter import *
-import tkMessageBox
-import re
+
+class Result:
+    def __init__(self, a):
+        self.a = a
 
 
-def submitted(event=None):
-    test_str = txt.get()
-    matchResponse = re.match(regex, test_str, re.IGNORECASE)
+def QueryToKeep(ListOfFolders):
 
-    if matchResponse == None:
-        Result = 'Fail'
-        tkMessageBox.showerror(test_str, "Verification " + Result)
-    elif len(test_str) == matchResponse.endpos:
-        Result = 'Success'
-        tkMessageBox.showinfo(test_str, "Verification " + Result)
-    else:
-        Result = 'Fail'
-        tkMessageBox.showerror(test_str, "Verification " + Result)
+    selectedResult = Result(-1)
+
+    def submitted(event=None):
+
+        selectedResult.a = selected.get()
+
+        window.destroy()
+        return selectedResult
 
 
-def quitted():
-    lbl.configure(text="Quitted")
-    exit()
+    def quitted():
+        lbl.configure(text="Quitted")
+        selectedResult.a = -1
+        window.destroy()
 
 
-def QueryToKeep():
-    regex = ur"^([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63})|(\+972 ?[0-9]{9}) | (\+380 ?[0-9]{9}) |((\([0-9]{3}\) *|[0-9]{3} *-? *)[0-9]{3} *-? *[0-9]{4})"
 
     window = Tk()
 
     window.bind('<Return>', submitted)
 
-    window.title("Email / Phone")
+    window.title("Folder to keep")
     window.geometry('500x200')
 
-    lbl = Label(window, text="type Email/Phone:")
+    lbl = Label(window, text="Select folder to keep")
     lbl.grid(column=0, row=0)
 
-    txt = Entry(window, width=45)
-    txt.grid(column=1, row=1)
-
     btn = Button(window, text="Submit", command=submitted)
-    btn.grid(column=1, row=2)
+    btn.grid(column=1, row=4)
 
     btn = Button(window, text="Quit", command=quitted)
-    btn.grid(column=2, row=2)
+    btn.grid(column=2, row=4)
+
+    selected = IntVar()
+
+    rad1 = Radiobutton(window, text=ListOfFolders[0], value=1, variable=selected)
+
+    if len(ListOfFolders)>=2:
+        rad2 = Radiobutton(window, text=ListOfFolders[1], value=2, variable=selected)
+
+    if len(ListOfFolders)==3:
+        rad3 = Radiobutton(window, text=ListOfFolders[2], value=3, variable=selected)
+
+    rad1.grid(column=0, row=1)
+
+    rad2.grid(column=0, row=2)
+
+    rad3.grid(column=0, row=3)
 
     window.mainloop()
-    return
+
+    return (selectedResult)
+
+
 
 
 
