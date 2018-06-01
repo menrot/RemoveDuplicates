@@ -20,6 +20,7 @@ RemoveDuplicates
 import sys
 import re
 import codecs
+from QueryToKeep import QueryToKeep
 
 
 class FileInfo(object):
@@ -140,15 +141,9 @@ if __name__ == '__main__':
         for j in range(0, len(dupTuples[i])):
             print i, j, dupTuples[i][j]
         print "Number of dups in this tuple %s" % DupsInTuple[i]
-        print
 
-
-
-
-
-
-
-
-
-
-
+        sel = QueryToKeep(dupTuples[i])
+        if sel > 0:
+            print "keep  %s" % (dupTuples[i][sel - 1])
+        else:
+            print "keep None"
