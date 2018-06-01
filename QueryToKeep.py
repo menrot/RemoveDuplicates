@@ -34,10 +34,10 @@ def QueryToKeep(ListOfFolders):
     lbl.grid(column=0, row=0)
 
     btn = Button(window, text="Submit", command=submitted)
-    btn.grid(column=1, row=4)
+    btn.grid(column=0, row=4)
 
     btn = Button(window, text="Quit", command=quitted)
-    btn.grid(column=2, row=4)
+    btn.grid(column=1, row=4)
 
     selected = IntVar()
 
@@ -51,6 +51,7 @@ def QueryToKeep(ListOfFolders):
     if len(ListOfFolders) == 3:
         rad3 = Radiobutton(window, text=ListOfFolders[2], value=3, variable=selected)
         rad3.grid(column=0, row=3, sticky=W)
+
 
 
     window.mainloop()
