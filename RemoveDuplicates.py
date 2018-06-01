@@ -10,6 +10,7 @@ RemoveDuplicates
         CCleaner -> Tools -> Duplicate Finder
         Find duplicate based on size and content (2 check boxes)
         Add the folder whose subtree you want to analyze and check only it
+        Save text file
 
     1. Parse the txt file
     2. build a list of all duplicates
@@ -157,29 +158,29 @@ if __name__ == '__main__':
                 # remove dupes inside the folder
                 for j in range(0, len(allDups)):
                     if allDups[j].tupleID == i:
-                        seldel = sel - 1
-                        fbat.write('del "%s\\%s"\n' % (dupTuples[i][seldel],allDups[j].Dups[sel-1].Name))
+                        if sel == 1:
+                            fbat.write('del "%s\\%s"\n' % (dupTuples[i][seldel],allDups[j].Dups[0].Name))
+                        else:
+                            print 'Wrong sel'
             elif len(dupTuples[i]) == 2:
                 # remove dupes inside from one folder
                 for j in range(0, len(allDups)):
                     if allDups[j].tupleID == i:
                         seldel = 2 - sel # delete from the other folder
-                        fbat.write('del "%s\\%s"\n' % (dupTuples[i][seldel], allDups[j].Dups[sel - 1].Name))
+                        for k in range(0, len(allDups[j].Dups)):
+                            if dupTuples[i][seldel] == allDups[j].Dups[k].Path:
+                                fbat.write('del "%s\\%s"\n' % (dupTuples[i][seldel], allDups[j].Dups[k].Name))
             else:
                 # remove dupes inside from two folder
                 for j in range(0, len(allDups)):
                     if allDups[j].tupleID == i:
-                        if sel == 1:
-                            fbat.write('del "%s\\%s"\n' % (dupTuples[i][1], allDups[j].Dups[sel - 1].Name))
-                            fbat.write('del "%s\\%s"\n' % (dupTuples[i][2], allDups[j].Dups[sel - 1].Name))
-                        elif sel == 2:
-                            fbat.write('del "%s\\%s"\n' % (dupTuples[i][0], allDups[j].Dups[sel - 1].Name))
-                            fbat.write('del "%s\\%s"\n' % (dupTuples[i][2], allDups[j].Dups[sel - 1].Name))
-                        elif sel ==3:
-                            fbat.write('del "%s\\%s"\n' % (dupTuples[i][0], allDups[j].Dups[sel - 1].Name))
-                            fbat.write('del "%s\\%s"\n' % (dupTuples[i][1], allDups[j].Dups[sel - 1].Name))
-                        else:
-                            print "Wrong selection %s" % sel
+                        for k in range(0, len(allDups[j].Dups)):
+                            for m in range(0, len(dupTuples[i])):
+                                if (sel-1) <> m:
+                                    if dupTuples[i][seldel] == allDups[j].Dups[k].Path:
+                                        fbat.write('del "%s\\%s"\n' % (dupTuples[i][m], allDups[j].Dups[k].Name))
+
+
         else:
             print "keep None"
         print
