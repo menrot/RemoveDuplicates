@@ -16,14 +16,22 @@ RemoveDuplicates
     2. build a list of all duplicates
     3. Build a list of all conflicting duplicates
     3. For each tuple, decide who is the path to be kept
-    4. create a BAT file to delete all teh other files.
+    4. create a BAT file to delete all the other files.
+        4.1 In case of a single folder, the files deleted are the newer ones and if datetme equal, the ones with longer file name
+            (the file name length is not always optimal)
 
+
+
+    NOTE:
+        You need to run several times, as in one pass the use case of multiple in one folder AND instance in another folder is not handled
+        If there are more then 2 copies in one folder - also has to run several time ccleaner
 """
 
 
 import sys
 import re
 import codecs
+from datetime import datetime
 from QueryToKeep import QueryToKeep
 
 
@@ -33,7 +41,7 @@ class FileInfo(object):
         self.Name = listFileData[1]
         self.Path = listFileData[2]
         self.Size = listFileData[3]
-        self.Date = listFileData[4]
+        self.Date = datetime.strptime(listFileData[4],'%d/%m/%y %H:%M:%S %p')
         return(None)
 
     def __str__(self):
@@ -142,7 +150,7 @@ if __name__ == '__main__':
     fbat = open('./rmdups.bat', 'w+')
 
 
-    fbat.write('@echo off\ncall :sub 1>rmdups.log 2>&1\nexit /b\n:sub\n') # create log file of the batch execution
+    fbat.write('@echo off\ncall :sub 1>rmdups.log 2>&1\nexit /b\n:sub\necho *** start delete\n') # create log file of the batch execution
 
     print "number of tuples %s" % len(dupTuples)
     # print dupTuples
@@ -159,7 +167,19 @@ if __name__ == '__main__':
                 for j in range(0, len(allDups)):
                     if allDups[j].tupleID == i:
                         if sel == 1:
-                            fbat.write('del "%s\\%s"\n' % (dupTuples[i][seldel],allDups[j].Dups[0].Name))
+                            kDate = datetime(1900, 1, 1, 1, 1, 1)
+                            kSel = 0
+                            for k in range(0, len(allDups[j].Dups)):
+                                if allDups[j].Dups[k].Date > kDate:
+                                    # select oldest name to delete
+                                    kDate = allDups[j].Dups[k].Date
+                                    kSel = k
+                                elif allDups[j].Dups[k].Date == kDate:
+                                    if len(allDups[j].Dups[k].Name) > len(allDups[j].Dups[kSel].Name):
+                                        # select longest name to delete
+                                        kDate = allDups[j].Dups[k].Date
+                                        kSel = k
+                            fbat.write('del "%s\\%s"\n' % (dupTuples[i][0],allDups[j].Dups[kSel].Name))
                         else:
                             print 'Wrong sel'
             elif len(dupTuples[i]) == 2:
@@ -177,13 +197,14 @@ if __name__ == '__main__':
                         for k in range(0, len(allDups[j].Dups)):
                             for m in range(0, len(dupTuples[i])):
                                 if (sel-1) <> m:
-                                    if dupTuples[i][seldel] == allDups[j].Dups[k].Path:
+                                    if dupTuples[i][m] == allDups[j].Dups[k].Path:
                                         fbat.write('del "%s\\%s"\n' % (dupTuples[i][m], allDups[j].Dups[k].Name))
 
 
         else:
             print "keep None"
         print
+    fbat.write('echo *** end delete')
     fbat.close()
 
 
