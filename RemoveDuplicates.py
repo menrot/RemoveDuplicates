@@ -33,6 +33,8 @@ import re
 import codecs
 from datetime import datetime
 from QueryToKeep import QueryToKeep
+import argparse
+import os
 
 
 class FileInfo(object):
@@ -86,20 +88,44 @@ def DuplicateTuple(dupInst):
 
 REGEX_START_INSTANCE = ur"^-----+\r$" ## line with only dashes
 REGEX_FILE_IN_INSTANCE = \
-    ur"^([a-z0-9\~\_\.\-\(\) ]+)\t([a-z0-9\.\-\(\)\\: ]+)\t([0-9\. ]+ [kbm]{2})\t" + \
-        ur"([0-9]{2}/[0-9]{2}/[0-9]{2} [0-9]{1,2}\:[0-9]{2}\:[0-9]{2} [apm]{2})"
+    ur"^([a-z0-9\~\_\.\-\(\) ]+)\t([a-z0-9\.\-\_\'\+\(\)\\: ]+)\t([0-9\. ]+ [kbm]{2})\t" + \
+        ur"([0-9]{2}\/[0-9]{2}\/[0-9]{2} [0-9]{1,2}\:[0-9]{2}\:[0-9]{2} [apm]{2})"
+
+### Usage RemoveDuplicates.py RootFolder -r
+parser = argparse.ArgumentParser(description='Create BAT file to Delete duplicates base on DUPFILE')
+parser.add_argument('DupFile', metavar='DupFile', type=str,
+                    help='the file holding dups based on CCleaner')
+parser.add_argument('-B', dest='DoBatFile', action='store_true',  # By default - Dont create BAT
+                    help='When set- create the bat file')
+parser.add_argument('-s', dest='OnlySingle', action='store_true',  # By default - Dont create BAT
+                    help='Process only within folders dup')
+parser.add_argument('-T', dest='Threshold', help='Set Minimal dups in tuple to handle')
+
+
 
 if __name__ == '__main__':
 
-    if len(sys.argv) == 1:
-        print "usage: RemoveDuplicates dup_text_file"
-        exit()
+    print 'Remove Duplicates 2.0'  # update release number
 
+    MyArgs = vars(parser.parse_args())
+
+    # create variables
+    locals().update(MyArgs)
+
+    origDir = os.getcwd()
 
     allDups = []
     dupTuples = []
+    if Threshold is None:
+        Threshold = 0
+    else:
+        try:
+            Threshold = int(Threshold)
+        except:
+            print >> sys.stderr, "Threshold value wrong %s" % Threshold
+            Threshold = 0
 
-    with codecs.open(sys.argv[1], encoding='utf-16', mode='r') as f:
+    with codecs.open(DupFile, encoding='utf-16', mode='r') as f:
         instance = False
         for line in f:
 
@@ -155,55 +181,73 @@ if __name__ == '__main__':
     print "number of tuples %s" % len(dupTuples)
     # print dupTuples
     for i in range(0, len(dupTuples)):
-        for j in range(0, len(dupTuples[i])):
-            print i, j, dupTuples[i][j]
-        print "Number of dups in this tuple %s" % DupsInTuple[i]
+        if DupsInTuple[i] > Threshold and(OnlySingle and len(dupTuples[i])==1 or not OnlySingle):
+            for j in range(0, len(dupTuples[i])):
+                print i, j, dupTuples[i][j]
+            print "Number of dups in this tuple %s" % DupsInTuple[i]
 
-        sel = QueryToKeep(dupTuples[i])
-        if sel > 0:
-            print "keep  %s" % (dupTuples[i][sel-1])
-            if len(dupTuples[i]) == 1:
-                # remove dupes inside the folder
-                for j in range(0, len(allDups)):
-                    if allDups[j].tupleID == i:
-                        if sel == 1:
-                            kDate = datetime(1900, 1, 1, 1, 1, 1)
-                            kSel = 0
-                            for k in range(0, len(allDups[j].Dups)):
-                                if allDups[j].Dups[k].Date > kDate:
-                                    # select oldest name to delete
-                                    kDate = allDups[j].Dups[k].Date
-                                    kSel = k
-                                elif allDups[j].Dups[k].Date == kDate:
-                                    if len(allDups[j].Dups[k].Name) > len(allDups[j].Dups[kSel].Name):
-                                        # select longest name to delete
+            if DoBatFile:
+                sel = QueryToKeep(dupTuples[i])
+            else:
+                sel = 0
+            if sel < 0:
+                break
+            if sel > 0:
+                print "keep  %s" % (dupTuples[i][sel-1])
+                if len(dupTuples[i]) == 1:
+                    # remove dupes inside the folder
+                    for j in range(0, len(allDups)):
+                        if allDups[j].tupleID == i:
+                            if sel == 1:
+                                kDate = datetime(2100, 1, 1, 1, 1, 1)
+                                kSel = 0
+                                for k in range(0, len(allDups[j].Dups)):
+                                    if allDups[j].Dups[k].Date < kDate:
+                                        # select oldest name to keep
                                         kDate = allDups[j].Dups[k].Date
                                         kSel = k
-                            fbat.write('del "%s\\%s"\n' % (dupTuples[i][0],allDups[j].Dups[kSel].Name))
-                        else:
-                            print 'Wrong sel'
-            elif len(dupTuples[i]) == 2:
-                # remove dupes inside from one folder
-                for j in range(0, len(allDups)):
-                    if allDups[j].tupleID == i:
-                        seldel = 2 - sel # delete from the other folder
-                        for k in range(0, len(allDups[j].Dups)):
-                            if dupTuples[i][seldel] == allDups[j].Dups[k].Path:
-                                fbat.write('del "%s\\%s"\n' % (dupTuples[i][seldel], allDups[j].Dups[k].Name))
+                                    elif allDups[j].Dups[k].Date == kDate:
+                                        if len(allDups[j].Dups[k].Name) > len(allDups[j].Dups[kSel].Name):
+                                            # select longest name to delete
+                                            kDate = allDups[j].Dups[k].Date
+                                            kSel = k
+                                #fbat.write('del "%s\\%s"\n' % (dupTuples[i][0], allDups[j].Dups[kSel].Name))
+                                ToBeDeletedFolder = "\ToBe Deleted" + dupTuples[i][0][2:]
+                                fbat.write('md "%s" 2>nul\n' % ToBeDeletedFolder)
+                                fbat.write('move "%s\\%s" "%s"\n' % (dupTuples[i][0][2:],allDups[j].Dups[kSel].Name, ToBeDeletedFolder))
+                            else:
+                                print 'Wrong sel'
+                elif len(dupTuples[i]) == 2:
+                    # remove dupes inside from one folder
+                    for j in range(0, len(allDups)):
+                        if allDups[j].tupleID == i:
+                            seldel = 2 - sel # delete from the other folder
+                            for k in range(0, len(allDups[j].Dups)):
+                                if dupTuples[i][seldel] == allDups[j].Dups[k].Path:
+                                    # fbat.write('del "%s\\%s"\n' % (dupTuples[i][seldel], allDups[j].Dups[k].Name))
+                                    ToBeDeletedFolder = "\ToBe Deleted" + dupTuples[i][seldel][2:]
+                                    fbat.write('md "%s" 2>nul\n' % ToBeDeletedFolder)
+                                    fbat.write('move "%s\\%s" "%s"\n' % (dupTuples[i][seldel][2:], allDups[j].Dups[k].Name, ToBeDeletedFolder))
+                else:
+                    # remove dupes inside from two folder
+                    for j in range(0, len(allDups)):
+                        if allDups[j].tupleID == i:
+                            for k in range(0, len(allDups[j].Dups)):
+                                for m in range(0, len(dupTuples[i])):
+                                    if (sel-1) <> m:
+                                        if dupTuples[i][m] == allDups[j].Dups[k].Path:
+                                            #fbat.write('del "%s\\%s"\n' % (dupTuples[i][m], allDups[j].Dups[k].Name))
+                                            ToBeDeletedFolder = "\ToBe Deleted" + dupTuples[i][m][2:]
+                                            fbat.write('md "%s" 2>nul\n' % ToBeDeletedFolder)
+                                            fbat.write('move "%s\\%s" "%s"\n' % (
+                                            dupTuples[i][m][2:], allDups[j].Dups[k].Name, ToBeDeletedFolder))
+
+
             else:
-                # remove dupes inside from two folder
-                for j in range(0, len(allDups)):
-                    if allDups[j].tupleID == i:
-                        for k in range(0, len(allDups[j].Dups)):
-                            for m in range(0, len(dupTuples[i])):
-                                if (sel-1) <> m:
-                                    if dupTuples[i][m] == allDups[j].Dups[k].Path:
-                                        fbat.write('del "%s\\%s"\n' % (dupTuples[i][m], allDups[j].Dups[k].Name))
+                print "keep None"
+                print
 
 
-        else:
-            print "keep None"
-        print
     fbat.write('echo *** end delete')
     fbat.close()
 

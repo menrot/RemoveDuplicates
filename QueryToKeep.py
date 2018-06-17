@@ -18,10 +18,13 @@ def QueryToKeep(ListOfFolders):
 
     def quitted():
         lbl.configure(text="Quitted")
-        selectedResult.selected = -1
+        selectedResult.selected = 0
         window.destroy()
 
-
+    def quittedAll():
+        lbl.configure(text="Quitted All")
+        selectedResult.selected = -1
+        window.destroy()
 
     window = Tk()
 
@@ -38,6 +41,9 @@ def QueryToKeep(ListOfFolders):
 
     btn = Button(window, text="Quit", command=quitted)
     btn.grid(column=1, row=4)
+
+    btn = Button(window, text="Quit All", command=quittedAll)
+    btn.grid(column=2, row=4)
 
     selected = IntVar()
 
