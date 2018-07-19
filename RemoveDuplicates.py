@@ -93,11 +93,18 @@ class TupleInstance(object):
         return
 
     def __eq__(self, other):
-        if self.DupsInTuple == other.DupsInTuple and self.exclude == other.exclude and self.Folders == other.Folders:
+        if self.Folders == other.Folders:
             return True
         else:
             return False
 
+    def checkExclude(self, exclude_string):
+        if (not self.exclude) and not(exclude_string is None): ### CHECK HERE ####
+            for i in range(0, len(self.Folders)):
+                if exclude_string.lower() in self.Folders[i].lower():
+                    self.exclude = True
+                    break
+        return
 
 def DuplicateTuple(dupInst):
     dupsSofar = []
@@ -109,9 +116,11 @@ def DuplicateTuple(dupInst):
     return dupsSofar
 
 REGEX_START_INSTANCE = ur"^-----+\r$" ## line with only dashes
-REGEX_FILE_IN_INSTANCE = \
-    ur"^([a-z0-9\~\_\.\-\(\) ]+)\t([a-z0-9\.\-\_\'\+\(\)\\: ]+)\t([0-9\. ]+ [kbm]{2})\t" + \
-        ur"([0-9]{2}\/[0-9]{2}\/[0-9]{2} [0-9]{1,2}\:[0-9]{2}\:[0-9]{2} [apm]{2})"
+REGEX_FILE_IN_INSTANCE = ur"^([\u0020-\u9fff]+)\t([\u0020-\u9fff]+)\t([0-9\. ]+ [kbmg]{2})\t([0-9]{2}\/[0-9]{2}\/[0-9]{2} [0-9]{1,2}\:[0-9]{2}\:[0-9]{2} [apm]{2})"
+
+#    ur"^([a-zA-Z0-9\u0590-\u05FF\u0020-\u9fff\,\'\~\$\_\.\-\(\)\]\[\+ ]+)\t([a-zA-Z0-9\u0590-\u05FF\u0020-\u9fff\.\-\$\_\'\+\(\)\\: ]+)\t([0-9\. ]+ [kbm]{2})\t" + \
+#        ur"([0-9]{2}\/[0-9]{2}\/[0-9]{2} [0-9]{1,2}\:[0-9]{2}\:[0-9]{2} [apm]{2})"
+
 
 ### Usage RemoveDuplicates.py RootFolder -r
 parser = argparse.ArgumentParser(description='Create BAT file to Delete duplicates base on DUPFILE')
@@ -169,6 +178,7 @@ if __name__ == '__main__':
 
                     dt = TupleInstance(CurrentInstance.Dups)
                     if not (dt in dupTuples):
+                        dt.checkExclude(Exclude)
                         dupTuples.append(dt)
 
                     CurrentInstance.tupleID = dupTuples.index(dt)
@@ -176,10 +186,14 @@ if __name__ == '__main__':
                     CurrentInstance = DuplicateInstance() # start new instance
                 else:
                     #its an error
-                    print >> sys.stderr, "Unexpecetd line %s" % line
+                    try:
+                        print >> sys.stderr, "Unexpecetd line %s" % line
+                    except Exception as e:
+                        print >> sys.stderr, 'Exception %s %s', e.message, e.args
 
         dt = TupleInstance(CurrentInstance.Dups)
         if not (dt in dupTuples):
+            dt.checkExclude(Exclude)
             dupTuples.append(dt)
         CurrentInstance.tupleID = dupTuples.index(dt)
         allDups.append(CurrentInstance)
@@ -209,21 +223,21 @@ if __name__ == '__main__':
     # print dupTuples
     for i in range(0, len(dupTuples)):
         #if DupsInTuple[i] > Threshold and(OnlySingle and len(dupTuples[i])==1 or not OnlySingle):
-        if dupTuples[i].DupsInTuple > Threshold and (OnlySingle and len(dupTuples[i]) == 1 or not OnlySingle):
+        if dupTuples[i].DupsInTuple > Threshold and (OnlySingle and len(dupTuples[i].Folders) == 1 or not OnlySingle) and  not(dupTuples[i].exclude):
             for j in range(0, len(dupTuples[i].Folders)):
                 print i, j, dupTuples[i].Folders[j]
                 #dupTuples[i].exclude = dupTuples[i].exclude or (Exclude in dupTuples[i][j].lower())
-            print "Number of dups in this tuple %s" % dupTuples[i].DupsInTuple
+            print "Number of dups in this tuple %s and exclude is %s" % (dupTuples[i].DupsInTuple,dupTuples[i].exclude)
 
             if DoBatFile:
-                sel = QueryToKeep(dupTuples[i])
+                sel = QueryToKeep(dupTuples[i].Folders)
             else:
                 sel = 0
             if sel < 0:
                 break
             if sel > 0:
-                print "keep  %s" % (dupTuples[i][sel-1])
-                if len(dupTuples[i]) == 1:
+                print "keep  %s" % (dupTuples[i].Folders[sel-1])
+                if len(dupTuples[i].Folders) == 1:
                     # remove dupes inside the folder
                     for j in range(0, len(allDups)):
                         if allDups[j].tupleID == i:
@@ -241,46 +255,49 @@ if __name__ == '__main__':
                                             kDate = allDups[j].Dups[k].Date
                                             kSel = k
                                 if DoDelete:
-                                    fbat.write('del "%s\\%s"\n' % (dupTuples[i][0], allDups[j].Dups[kSel].Name))
+                                    fbat.write('del "%s\\%s"\n' % (dupTuples[i].Folders[0], allDups[j].Dups[kSel].Name))
                                 else:
-                                    ToBeDeletedFolder = "\ToBe Deleted" + dupTuples[i][0][2:]
+                                    ToBeDeletedFolder = "\ToBe Deleted" + dupTuples[i].Folders[0][2:]
                                     fbat.write('md "%s" 2>nul\n' % ToBeDeletedFolder)
-                                    fbat.write('move "%s\\%s" "%s"\n' % (dupTuples[i][0][2:],allDups[j].Dups[kSel].Name, ToBeDeletedFolder))
+                                    fbat.write('move "%s\\%s" "%s"\n' % (dupTuples[i].Folders[0][2:],allDups[j].Dups[kSel].Name, ToBeDeletedFolder))
                             else:
                                 print 'Wrong sel'
-                elif len(dupTuples[i]) == 2:
+                elif len(dupTuples[i].Folders) == 2:
                     # remove dupes inside from one folder
                     for j in range(0, len(allDups)):
                         if allDups[j].tupleID == i:
                             seldel = 2 - sel # delete from the other folder
                             for k in range(0, len(allDups[j].Dups)):
-                                if dupTuples[i][seldel] == allDups[j].Dups[k].Path:
+                                if dupTuples[i].Folders[seldel] == allDups[j].Dups[k].Path:
                                     if DoDelete:
-                                        fbat.write('del "%s\\%s"\n' % (dupTuples[i][seldel], allDups[j].Dups[k].Name))
+                                        fbat.write('del "%s\\%s"\n' % (dupTuples[i].Folders[seldel], allDups[j].Dups[k].Name))
                                     else:
-                                        ToBeDeletedFolder = "\ToBe Deleted" + dupTuples[i][seldel][2:]
+                                        ToBeDeletedFolder = "\ToBe Deleted" + dupTuples[i].Folders[seldel][2:]
                                         fbat.write('md "%s" 2>nul\n' % ToBeDeletedFolder)
-                                        fbat.write('move "%s\\%s" "%s"\n' % (dupTuples[i][seldel][2:], allDups[j].Dups[k].Name, ToBeDeletedFolder))
+                                        fbat.write('move "%s\\%s" "%s"\n' % (dupTuples[i].Folders[seldel][2:], allDups[j].Dups[k].Name, ToBeDeletedFolder))
                 else:
                     # remove dupes inside from two folder
                     for j in range(0, len(allDups)):
                         if allDups[j].tupleID == i:
                             for k in range(0, len(allDups[j].Dups)):
-                                for m in range(0, len(dupTuples[i])):
+                                for m in range(0, len(dupTuples[i].Folders)):
                                     if (sel-1) <> m:
-                                        if dupTuples[i][m] == allDups[j].Dups[k].Path:
+                                        if dupTuples[i].Folders[m] == allDups[j].Dups[k].Path:
                                             if DoDelete:
-                                                fbat.write('del "%s\\%s"\n' % (dupTuples[i][m], allDups[j].Dups[k].Name))
+                                                fbat.write('del "%s\\%s"\n' % (dupTuples[i].Folders[m], allDups[j].Dups[k].Name))
                                             else:
-                                                ToBeDeletedFolder = "\ToBe Deleted" + dupTuples[i][m][2:]
-                                                fbat.write('md "%s" 2>nul\n' % ToBeDeletedFolder)
-                                                fbat.write('move "%s\\%s" "%s"\n' % (
-                                                    dupTuples[i][m][2:], allDups[j].Dups[k].Name, ToBeDeletedFolder))
+                                                ToBeDeletedFolder = "\ToBe Deleted" + dupTuples[i].Folders[m][2:]
+                                                try: ## To overcomey ASCII issues
+                                                    fbat.write('md "%s" 2>nul\n' % ToBeDeletedFolder)
+                                                    fbat.write('move "%s\\%s" "%s"\n' % (
+                                                        dupTuples[i].Folders[m][2:], allDups[j].Dups[k].Name, ToBeDeletedFolder))
+                                                except Exception as e:
+                                                    print >> sys.stderr, 'Exception %s %s', e.message, e.args
 
 
             else:
                 print "keep None"
-                print
+            print
 
 
     fbat.write('echo *** end delete')
