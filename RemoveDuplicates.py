@@ -217,7 +217,7 @@ if __name__ == '__main__':
     fbat = open('./rmdups.bat', 'w+')
 
 
-    fbat.write('@echo off\ncall :sub 1>rmdups.log 2>&1\nexit /b\n:sub\necho *** start delete\n') # create log file of the batch execution
+    fbat.write('@echo off\ncall :sub 1>rmdups.log 2>&1\nexit /b\n:sub\n@echo on\nCHCP 65001\necho *** start delete\n') # create log file of the batch execution
 
     print "number of tuples %s" % len(dupTuples)
     # print dupTuples
@@ -225,7 +225,7 @@ if __name__ == '__main__':
         #if DupsInTuple[i] > Threshold and(OnlySingle and len(dupTuples[i])==1 or not OnlySingle):
         if dupTuples[i].DupsInTuple > Threshold and (OnlySingle and len(dupTuples[i].Folders) == 1 or not OnlySingle) and  not(dupTuples[i].exclude):
             for j in range(0, len(dupTuples[i].Folders)):
-                print i, j, dupTuples[i].Folders[j]
+                print i, j, dupTuples[i].Folders[j].encode('UTF-8')
                 #dupTuples[i].exclude = dupTuples[i].exclude or (Exclude in dupTuples[i][j].lower())
             print "Number of dups in this tuple %s and exclude is %s" % (dupTuples[i].DupsInTuple,dupTuples[i].exclude)
 
@@ -236,7 +236,7 @@ if __name__ == '__main__':
             if sel < 0:
                 break
             if sel > 0:
-                print "keep  %s" % (dupTuples[i].Folders[sel-1])
+                print "keep  %s" % (dupTuples[i].Folders[sel-1].encode('UTF-8'))
                 if len(dupTuples[i].Folders) == 1:
                     # remove dupes inside the folder
                     for j in range(0, len(allDups)):
@@ -255,11 +255,11 @@ if __name__ == '__main__':
                                             kDate = allDups[j].Dups[k].Date
                                             kSel = k
                                 if DoDelete:
-                                    fbat.write('del "%s\\%s"\n' % (dupTuples[i].Folders[0], allDups[j].Dups[kSel].Name))
+                                    fbat.write('del "%s\\%s"\n' % (dupTuples[i].Folders[0].encode('UTF-8'), allDups[j].Dups[kSel].Name.encode('UTF-8')))
                                 else:
                                     ToBeDeletedFolder = "\ToBe Deleted" + dupTuples[i].Folders[0][2:]
-                                    fbat.write('md "%s" 2>nul\n' % ToBeDeletedFolder)
-                                    fbat.write('move "%s\\%s" "%s"\n' % (dupTuples[i].Folders[0][2:],allDups[j].Dups[kSel].Name, ToBeDeletedFolder))
+                                    fbat.write('md "%s" 2>nul\n' % ToBeDeletedFolder.encode('UTF-8'))
+                                    fbat.write('move "%s\\%s" "%s"\n' % (dupTuples[i].Folders[0][2:].encode('UTF-8'),allDups[j].Dups[kSel].Name.encode('UTF-8'), ToBeDeletedFolder.encode('UTF-8')))
                             else:
                                 print 'Wrong sel'
                 elif len(dupTuples[i].Folders) == 2:
@@ -270,11 +270,11 @@ if __name__ == '__main__':
                             for k in range(0, len(allDups[j].Dups)):
                                 if dupTuples[i].Folders[seldel] == allDups[j].Dups[k].Path:
                                     if DoDelete:
-                                        fbat.write('del "%s\\%s"\n' % (dupTuples[i].Folders[seldel], allDups[j].Dups[k].Name))
+                                        fbat.write('del "%s\\%s"\n' % (dupTuples[i].Folders[seldel].encode('UTF-8'), allDups[j].Dups[k].Name.encode('UTF-8')))
                                     else:
                                         ToBeDeletedFolder = "\ToBe Deleted" + dupTuples[i].Folders[seldel][2:]
-                                        fbat.write('md "%s" 2>nul\n' % ToBeDeletedFolder)
-                                        fbat.write('move "%s\\%s" "%s"\n' % (dupTuples[i].Folders[seldel][2:], allDups[j].Dups[k].Name, ToBeDeletedFolder))
+                                        fbat.write('md "%s" 2>nul\n' % ToBeDeletedFolder.encode('UTF-8'))
+                                        fbat.write('move "%s\\%s" "%s"\n' % (dupTuples[i].Folders[seldel][2:].encode('UTF-8'), allDups[j].Dups[k].Name.encode('UTF-8'), ToBeDeletedFolder.encode('UTF-8')))
                 else:
                     # remove dupes inside from two folder
                     for j in range(0, len(allDups)):
@@ -284,13 +284,13 @@ if __name__ == '__main__':
                                     if (sel-1) <> m:
                                         if dupTuples[i].Folders[m] == allDups[j].Dups[k].Path:
                                             if DoDelete:
-                                                fbat.write('del "%s\\%s"\n' % (dupTuples[i].Folders[m], allDups[j].Dups[k].Name))
+                                                fbat.write('del "%s\\%s"\n' % (dupTuples[i].Folders[m].encode('UTF-8'), allDups[j].Dups[k].Name.encode('UTF-8')))
                                             else:
                                                 ToBeDeletedFolder = "\ToBe Deleted" + dupTuples[i].Folders[m][2:]
                                                 try: ## To overcomey ASCII issues
-                                                    fbat.write('md "%s" 2>nul\n' % ToBeDeletedFolder)
+                                                    fbat.write('md "%s" 2>nul\n' % ToBeDeletedFolder.encode('UTF-8'))
                                                     fbat.write('move "%s\\%s" "%s"\n' % (
-                                                        dupTuples[i].Folders[m][2:], allDups[j].Dups[k].Name, ToBeDeletedFolder))
+                                                        dupTuples[i].Folders[m][2:].encode('UTF-8'), allDups[j].Dups[k].Name.encode('UTF-8'), ToBeDeletedFolder.encode('UTF-8')))
                                                 except Exception as e:
                                                     print >> sys.stderr, 'Exception %s %s', e.message, e.args
 
