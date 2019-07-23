@@ -43,7 +43,7 @@ class FileInfo(object):
         self.Name = listFileData[1]
         self.Path = listFileData[2]
         self.Size = listFileData[3]
-        self.Date = datetime.strptime(listFileData[4],'%d/%m/%y %H:%M:%S %p')
+        self.Date = datetime.strptime(listFileData[4],'%m/%d/%Y %H:%M:%S %p')
         return(None)
 
     def __str__(self):
@@ -115,8 +115,8 @@ def DuplicateTuple(dupInst):
     dupsSofar.sort()
     return dupsSofar
 
-REGEX_START_INSTANCE = ur"^-----+\r$" ## line with only dashes
-REGEX_FILE_IN_INSTANCE = ur"^([\u0020-\u9fff]+)\t([\u0020-\u9fff]+)\t([0-9\. ]+ [kbmg]{2})\t([0-9]{2}\/[0-9]{2}\/[0-9]{2} [0-9]{1,2}\:[0-9]{2}\:[0-9]{2} [apm]{2})"
+REGEX_START_INSTANCE = r"^-----+\r$" ## line with only dashes
+REGEX_FILE_IN_INSTANCE = r"^([\u0020-\u9fff]+)\t([\u0020-\u9fff]+)\t([0-9\. ]+ [kbmg]{2})\t([0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4} [0-9]{1,2}\:[0-9]{2}\:[0-9]{2} [apm]{2})"
 
 #    ur"^([a-zA-Z0-9\u0590-\u05FF\u0020-\u9fff\,\'\~\$\_\.\-\(\)\]\[\+ ]+)\t([a-zA-Z0-9\u0590-\u05FF\u0020-\u9fff\.\-\$\_\'\+\(\)\\: ]+)\t([0-9\. ]+ [kbm]{2})\t" + \
 #        ur"([0-9]{2}\/[0-9]{2}\/[0-9]{2} [0-9]{1,2}\:[0-9]{2}\:[0-9]{2} [apm]{2})"
@@ -138,7 +138,7 @@ parser.add_argument('-x', dest='Exclude', help='Exclude tuples including the tex
 
 if __name__ == '__main__':
 
-    print 'Remove Duplicates 2.0'  # update release number
+    print ('Remove Duplicates 2.3')  # update release number
 
     MyArgs = vars(parser.parse_args())
 
@@ -155,7 +155,7 @@ if __name__ == '__main__':
         try:
             Threshold = int(Threshold)
         except:
-            print >> sys.stderr, "Threshold value wrong %s" % Threshold
+            print ("Threshold value wrong %s" % Threshold, file=sys.stderr)
             Threshold = 0
 
 
@@ -187,9 +187,9 @@ if __name__ == '__main__':
                 else:
                     #its an error
                     try:
-                        print >> sys.stderr, "Unexpecetd line %s" % line
+                        print ("Unexpecetd line %s" % line, file=sys.stderr)
                     except Exception as e:
-                        print >> sys.stderr, 'Exception %s %s', e.message, e.args
+                        print ('Exception %s %s', (e.message, e.args), file=sys.stderr)
 
         dt = TupleInstance(CurrentInstance.Dups)
         if not (dt in dupTuples):
@@ -197,7 +197,7 @@ if __name__ == '__main__':
             dupTuples.append(dt)
         CurrentInstance.tupleID = dupTuples.index(dt)
         allDups.append(CurrentInstance)
-        print "Finished processing the duplicates file\n"
+        print ("Finished processing the duplicates file\n")
 
     """
 
@@ -205,7 +205,7 @@ if __name__ == '__main__':
 
     """
 
-    print "number of duplicates %s " % len(allDups)
+    print ("number of duplicates %s " % len(allDups))
 
     # DupsInTuple Count how many dups in each tuple
     DupsInTuple = [0] * (len(dupTuples))
@@ -219,15 +219,18 @@ if __name__ == '__main__':
 
     fbat.write('@echo off\ncall :sub 1>rmdups.log 2>&1\nexit /b\n:sub\n@echo on\nCHCP 65001\necho *** start delete\n') # create log file of the batch execution
 
-    print "number of tuples %s" % len(dupTuples)
+    print ("number of tuples %s" % len(dupTuples))
     # print dupTuples
     for i in range(0, len(dupTuples)):
         #if DupsInTuple[i] > Threshold and(OnlySingle and len(dupTuples[i])==1 or not OnlySingle):
         if dupTuples[i].DupsInTuple > Threshold and (OnlySingle and len(dupTuples[i].Folders) == 1 or not OnlySingle) and  not(dupTuples[i].exclude):
             for j in range(0, len(dupTuples[i].Folders)):
-                print i, j, dupTuples[i].Folders[j].encode('UTF-8')
-                #dupTuples[i].exclude = dupTuples[i].exclude or (Exclude in dupTuples[i][j].lower())
-            print "Number of dups in this tuple %s and exclude is %s" % (dupTuples[i].DupsInTuple,dupTuples[i].exclude)
+                if sys.version_info[0]<3:
+                    print (i, j, dupTuples[i].Folders[j].encode('UTF-8'))
+                    #dupTuples[i].exclude = dupTuples[i].exclude or (Exclude in dupTuples[i][j].lower())
+                else:
+                    print(i, j, dupTuples[i].Folders[j])
+            print ("Number of dups in this tuple %s and exclude is %s" % (dupTuples[i].DupsInTuple,dupTuples[i].exclude))
 
             if DoBatFile:
                 sel = QueryToKeep(dupTuples[i].Folders)
@@ -236,7 +239,7 @@ if __name__ == '__main__':
             if sel < 0:
                 break
             if sel > 0:
-                print "keep  %s" % (dupTuples[i].Folders[sel-1].encode('UTF-8'))
+                print ("keep  %s" % (dupTuples[i].Folders[sel-1].encode('UTF-8')))
                 if len(dupTuples[i].Folders) == 1:
                     # remove dupes inside the folder
                     for j in range(0, len(allDups)):
@@ -261,7 +264,7 @@ if __name__ == '__main__':
                                     fbat.write('md "%s" 2>nul\n' % ToBeDeletedFolder.encode('UTF-8'))
                                     fbat.write('move "%s\\%s" "%s"\n' % (dupTuples[i].Folders[0][2:].encode('UTF-8'),allDups[j].Dups[kSel].Name.encode('UTF-8'), ToBeDeletedFolder.encode('UTF-8')))
                             else:
-                                print 'Wrong sel'
+                                print ('Wrong sel')
                 elif len(dupTuples[i].Folders) == 2:
                     # remove dupes inside from one folder
                     for j in range(0, len(allDups)):
@@ -281,7 +284,7 @@ if __name__ == '__main__':
                         if allDups[j].tupleID == i:
                             for k in range(0, len(allDups[j].Dups)):
                                 for m in range(0, len(dupTuples[i].Folders)):
-                                    if (sel-1) <> m:
+                                    if (sel-1) != m:
                                         if dupTuples[i].Folders[m] == allDups[j].Dups[k].Path:
                                             if DoDelete:
                                                 fbat.write('del "%s\\%s"\n' % (dupTuples[i].Folders[m].encode('UTF-8'), allDups[j].Dups[k].Name.encode('UTF-8')))
@@ -292,12 +295,12 @@ if __name__ == '__main__':
                                                     fbat.write('move "%s\\%s" "%s"\n' % (
                                                         dupTuples[i].Folders[m][2:].encode('UTF-8'), allDups[j].Dups[k].Name.encode('UTF-8'), ToBeDeletedFolder.encode('UTF-8')))
                                                 except Exception as e:
-                                                    print >> sys.stderr, 'Exception %s %s', e.message, e.args
+                                                    print ('Exception %s %s', e.message, e.args, file=sys.stderr)
 
 
             else:
-                print "keep None"
-            print
+                print ("keep None")
+            print()
 
 
     fbat.write('echo *** end delete')
