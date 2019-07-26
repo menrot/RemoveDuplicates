@@ -39,7 +39,7 @@ def QueryToKeep(ListOfFolders):
     btn = Button(window, text="Submit", command=submitted)
     btn.grid(column=0, row=4)
 
-    btn = Button(window, text="Quit", command=quitted)
+    btn = Button(window, text="Skip", command=quitted)
     btn.grid(column=1, row=4)
 
     btn = Button(window, text="Quit All", command=quittedAll)
