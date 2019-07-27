@@ -282,11 +282,18 @@ if __name__ == '__main__':
                             for k in range(0, len(allDups[j].Dups)):
                                 if dupTuples[i].Folders[seldel] == allDups[j].Dups[k].Path:
                                     if DoDelete:
-                                        fbat.write('del "%s\\%s"\n' % (dupTuples[i].Folders[seldel], allDups[j].Dups[k].Name))
+                                        try: # to overcome illegal character mapping
+                                            fbat.write('del "%s\\%s"\n' % (dupTuples[i].Folders[seldel], allDups[j].Dups[k].Name))
+                                        except UnicodeEncodeError as e:
+                                            print('Exception UnicodeEncodeError %s ', (e.reason), file=sys.stderr)
+
                                     else:
                                         ToBeDeletedFolder = "\ToBe Deleted" + dupTuples[i].Folders[seldel][2:]
                                         fbat.write('md "%s" 2>nul\n' % ToBeDeletedFolder)
-                                        fbat.write('move "%s\\%s" "%s"\n' % (dupTuples[i].Folders[seldel][2:], allDups[j].Dups[k].Name, ToBeDeletedFolder))
+                                        try: # to overcome illegal character mapping
+                                            fbat.write('move "%s\\%s" "%s"\n' % (dupTuples[i].Folders[seldel][2:], allDups[j].Dups[k].Name, ToBeDeletedFolder))
+                                        except UnicodeEncodeError as e:
+                                            rint('Exception UnicodeEncodeError %s ', (e.reason), file=sys.stderr)
                 else:
                     # remove dupes inside from two folder
                     for j in range(0, len(allDups)):
