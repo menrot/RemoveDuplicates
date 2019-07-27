@@ -5,7 +5,7 @@
 """
 RemoveDuplicates
 
-    Release V3.0
+    Release V3.1
 
     Based on ccleaner duplicate finding.
         CCleaner -> Tools -> Duplicate Finder
@@ -107,9 +107,10 @@ class TupleInstance(object):
     def checkExclude(self, exclude_string):
         if (not self.exclude) and not(exclude_string is None): ### CHECK HERE ####
             for i in range(0, len(self.Folders)):
-                if exclude_string.lower() in self.Folders[i].lower():
-                    self.exclude = True
-                    break
+                for w in exclude_string.split():
+                    if w.lower() in self.Folders[i].lower():
+                        self.exclude = True
+                        break
         return
 
 def DuplicateTuple(dupInst):
@@ -139,7 +140,7 @@ parser.add_argument('-D', dest='DoDelete', action='store_true',  # By default - 
 parser.add_argument('-s', dest='OnlySingle', action='store_true',  # By default - not only single folder
                     help='Process only within folders dup')
 parser.add_argument('-T', dest='Threshold', help='Set Minimal dups in tuple to handle')
-parser.add_argument('-x', dest='Exclude', help='Exclude tuples including the text')
+parser.add_argument('-x', dest='Exclude', help='Exclude tuples including any word in the text')
 
 
 if __name__ == '__main__':
