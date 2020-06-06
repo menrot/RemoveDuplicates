@@ -106,3 +106,4 @@ workspace.xml
 *.log
 *.txt
 temp/
+data/
