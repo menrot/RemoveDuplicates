@@ -101,7 +101,7 @@ ENV/
 # Project specific
 *.xlsx
 .idea
-test.py
+test*.py
 workspace.xml
 *.log
 *.txt
